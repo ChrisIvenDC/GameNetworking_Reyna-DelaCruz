@@ -31,8 +31,10 @@ namespace GNW2.GameManager
         [SerializeField] private bool _autoStartServer = false;
 
         [Header("UI References")]
-        [SerializeField] private Button _button;
-        [SerializeField] private TMP_InputField _input;
+        [SerializeField] private Button _loginButton;
+        [SerializeField] private TMP_InputField _userLogInput, _passLogInput;
+        [SerializeField] private Button _registerButton;
+        [SerializeField] private TMP_InputField _userRegInput, _passRegInput, _passRepeatRegInput, _emailRegInput;
 
         // Dictionary tracking all active players in the session
         private Dictionary<PlayerRef, NetworkObject> _spawnedPlayers = new Dictionary<PlayerRef, NetworkObject>();
@@ -66,20 +68,65 @@ namespace GNW2.GameManager
             {
                 StartGame(_currentGameMode);
                 // Hide UI when auto-starting
-                if (_button != null && _button.transform.parent != null)
+                if (_loginButton != null && _loginButton.transform.parent != null)
                 {
-                    _button.transform.parent.gameObject.SetActive(false);
+                    _loginButton.transform.parent.gameObject.SetActive(false);
                 }
             }
             else
             {
                 // Setup start game button for manual start
-                if (_button != null)
+                if (_loginButton != null)
                 {
-                    _button.onClick.AddListener(() =>
+                    _registerButton.onClick.AddListener(() =>
                     {
-                        StartGame(_currentGameMode);
-                        _button.transform.parent.gameObject.SetActive(false);
+                        //check if empty
+                        if (_userRegInput.text != "" && _passRegInput.text != "" && _emailRegInput.text != "")
+                        {
+                            //check if pass and repeatpass are the same
+                            if (_passRegInput.text == _passRepeatRegInput.text)
+                            {
+                                var count = 1;
+                                while(PlayerPrefs.HasKey("PlayerUsername" + count))
+                                {
+                                    count++;
+                                }
+                                PlayerPrefs.SetString("PlayerUsername" + count, _userRegInput.text);
+                                PlayerPrefs.SetString("PlayerPassword" + count, _passRegInput.text);
+                                PlayerPrefs.SetString("PlayerEmail" + count, _emailRegInput.text);
+                                Debug.Log("REGISTERED!" +
+                                    "\nUsername: " + PlayerPrefs.GetString("PlayerUsername" + count) +
+                                    " | PassWord: " + PlayerPrefs.GetString("PlayerPassword" + count) +
+                                    " | Email: " + PlayerPrefs.GetString("PlayerEmail" + count));
+                            }
+                            else
+                                Debug.Log("Confirm Password does not match the Password");
+                        }
+                        else
+                            Debug.Log("Input REGISTER Username and Password");
+                    });
+
+                    _loginButton.onClick.AddListener(() =>
+                    {
+                        var count = 1;
+                        while (PlayerPrefs.HasKey("PlayerUsername" + count))
+                        {
+                            if (_userLogInput.text != "" && _passLogInput.text != "")
+                            {
+                                if (PlayerPrefs.GetString("PlayerUsername" + count) == _userLogInput.text &&
+                                PlayerPrefs.GetString("PlayerPassword" + count) == _passLogInput.text)
+                                {
+                                    StartGame(_currentGameMode);
+                                    _loginButton.transform.parent.gameObject.SetActive(false);
+                                    _registerButton.transform.parent.gameObject.SetActive(false);
+                                }
+                                else
+                                    Debug.Log("No Player Data Found");
+                            }
+                            else
+                                Debug.Log("Input LOGIN Username and Password");
+                            count++;
+                        }
                     });
                 }
             }
