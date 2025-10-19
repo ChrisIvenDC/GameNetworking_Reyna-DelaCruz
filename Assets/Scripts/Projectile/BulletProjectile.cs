@@ -38,8 +38,6 @@ namespace GNW2.Projectile
             if (Object.HasStateAuthority)
             {
                 
-                
-                
                 var combatInterface = other.collider.GetComponent<ICombat>();
                 if (combatInterface != null)
                 {

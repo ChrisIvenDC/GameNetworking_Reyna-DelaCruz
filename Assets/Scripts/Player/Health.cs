@@ -1,5 +1,4 @@
 using Fusion;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace GNW2.Player
@@ -29,8 +28,7 @@ namespace GNW2.Player
         {
             _currentHealth -= damage;
             Debug.Log($"Current Health: {_currentHealth}");
-            if(HasStateAuthority)
-                RPC_SpawnHitFx(transform.position);
+            RPC_SpawnHitFx(transform.position);
         }
         
         [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
